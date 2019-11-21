@@ -2,14 +2,27 @@
 
 <div class="container">
   <div class="notification">
-    <div id="js-add"></div>
+    <div id="js-add" class="card__list"></div>
   </div>
 </div>
 
 <div id="js-template">
-  <article>
-    <div class="article__title"></div>
-  </article>
+  <div class="card">
+    <div class="card-image">
+      <figure class="image is-4by3">
+        <a class="article__link" href="#" target="_blank">
+          <img class="article__image" src="" />
+        </a>
+      </figure>
+    </div>
+    <div class="card-content">
+      <div class="content">
+        <div class="article__title"></div>
+        <ul class="article__category"></ul>
+        <time datetime="2016-1-1" class="article__date"></time>
+      </div>
+    </div>
+  </div>
 </div>
 
 <%- include('/partials/footer') -%>
