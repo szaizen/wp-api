@@ -49,3 +49,20 @@ body {
 #js-template {
   display: none;
 }
+
+.main {
+  padding-top: 20px;
+  display: flex;
+  &__sidebar {
+    max-width: 300px;
+  }
+  &__content {
+    max-width: 1000px;
+  }
+}
+
+.menu-list {
+  & a {
+    font-size: 13px;
+  }
+}
