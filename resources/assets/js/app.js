@@ -71,3 +71,16 @@ function addCard(response) {
     $add.appendChild(clone);
   }
 }
+
+document.getElementById("js-search-btn").onclick = function() {
+  // 検索
+  let searchUrl =
+    ARTICLE_URL + "&search=" + document.getElementById("js-search-text").value;
+  searchUrl = encodeURI(searchUrl);
+
+  document.getElementById("js-add").textContent = null;
+  // 記事一覧取得
+  requestAjax(searchUrl, function(response) {
+    addCard(response);
+  });
+};
