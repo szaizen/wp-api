@@ -1,7 +1,7 @@
-const url = "https://liginc.co.jp";
-const api_url = url + "/wp-json/wp/v2/posts";
+const URL = "https://liginc.co.jp";
+const API_URL = URL + "/wp-json/wp/v2/posts";
 
-requestAjax(api_url, function(response) {
+requestAjax(API_URL, function(response) {
   addCard(response);
 });
 
@@ -18,11 +18,14 @@ function requestAjax(endpoint, callback) {
 }
 
 function addCard(response) {
-  var $template = document.getElementsByClassName("template")[0];
-  var $add = document.getElementsByClassName("add")[0];
+  const $template = document.getElementById("js-template");
+  const $add = document.getElementById("js-add");
+  const DISPLAYED_NUMBER = 10;
 
-  for (var i = 0; i < 10; i++) {
+  for (var i = 0; i < DISPLAYED_NUMBER; i++) {
     let clone = $template.firstElementChild.cloneNode(true);
+    clone.getElementsByClassName("article__title")[0].innerText =
+      response[i].title.rendered;
     clone.getElementsByClassName("article__title")[0].innerText =
       response[i].title.rendered;
     $add.appendChild(clone);
