@@ -1,9 +1,15 @@
-<%
-var title = 'wp api'
-%>
+<% var title = 'wp api' %><%- include('/partials/header', { title }) -%>
 
-<%- include('/partials/header', { title }) -%>
+<div class="container">
+  <div class="notification">
+    <div id="js-add"></div>
+  </div>
+</div>
 
-
+<div id="js-template">
+  <article>
+    <div class="article__title"></div>
+  </article>
+</div>
 
 <%- include('/partials/footer') -%>
