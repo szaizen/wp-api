@@ -1,0 +1,51 @@
+body {
+  background-color: whitesmoke;
+}
+
+.card {
+  width: 300px;
+  margin-bottom: 40px;
+
+  &__list {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    &:before {
+      content: "";
+      display: block;
+      width: 300px;
+      height: 0;
+      order: 1;
+    }
+    &:after {
+      content: "";
+      display: block;
+      width: 300px;
+      height: 0;
+    }
+  }
+}
+
+.article {
+  &__category {
+    margin: 0 !important;
+    display: flex;
+    flex-wrap: wrap;
+    & li {
+      list-style: none;
+      margin: 0 5px 0 0 !important;
+      font-size: 12px;
+      &:before {
+        content: "#";
+      }
+    }
+  }
+  &__date {
+    font-size: 13px;
+    letter-spacing: 0.7px;
+  }
+}
+
+#js-template {
+  display: none;
+}
