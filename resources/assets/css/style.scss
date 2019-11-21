@@ -28,12 +28,10 @@ body {
 
 .article {
   &__category {
-    margin: 0 !important;
     display: flex;
     flex-wrap: wrap;
-    & li {
+    li {
       list-style: none;
-      margin: 0 5px 0 0 !important;
       font-size: 12px;
       &:before {
         content: "#";
@@ -44,6 +42,15 @@ body {
     font-size: 13px;
     letter-spacing: 0.7px;
   }
+}
+
+/* Bulma 上書き対応 */
+.card ul.article__category {
+  margin: 0;
+  margin-bottom: 0;
+}
+.card .article__category li {
+  margin: 0 5px 0 0;
 }
 
 #js-template {

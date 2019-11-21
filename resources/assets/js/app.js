@@ -94,7 +94,7 @@ function dataFormat(response) {
   responseImage = response._embedded["wp:featuredmedia"][0].source_url;
 
   let date = new Date(response.date);
-  let responseDate =
+  responseDate =
     date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate();
 
   response.categories.forEach(function(value) {
