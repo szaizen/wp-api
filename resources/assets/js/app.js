@@ -37,6 +37,13 @@ function addCard(response) {
   const $add = document.getElementById("js-add");
   const DISPLAYED_NUMBER = 8;
 
+  if (response.length === 0) {
+    $add.innerText = "該当する記事はありませんでした";
+    return;
+  }
+
+  document.getElementById("js-add").textContent = null;
+
   for (var i = 0; i < DISPLAYED_NUMBER; i++) {
     const clone = $template.firstElementChild.cloneNode(true);
     clone.getElementsByClassName("article__link")[0].href = response[i].link;
@@ -78,7 +85,6 @@ document.getElementById("js-search-btn").onclick = function() {
     ARTICLE_URL + "&search=" + document.getElementById("js-search-text").value;
   searchUrl = encodeURI(searchUrl);
 
-  document.getElementById("js-add").textContent = null;
   // 記事一覧取得
   requestAjax(searchUrl, function(response) {
     addCard(response);
