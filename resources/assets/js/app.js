@@ -46,7 +46,7 @@ function addCard(response) {
       response[i]._embedded["wp:featuredmedia"][0].source_url;
 
     // categoryの名前検索
-    response[i].categories.forEach(function(value, index) {
+    response[i].categories.forEach(function(value) {
       const targetList = categoryList.filter(category => {
         return category.id === value;
       });
@@ -62,8 +62,8 @@ function addCard(response) {
     });
 
     // 日付変換
-    var date = new Date(response[i].date);
-    var formatDate =
+    let date = new Date(response[i].date);
+    let formatDate =
       date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate();
 
     clone.getElementsByClassName("article__date")[0].innerText = formatDate;
