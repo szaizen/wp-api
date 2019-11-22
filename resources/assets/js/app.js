@@ -66,11 +66,6 @@ document.getElementById("js-search-btn").onclick = function() {
 
 const $template = document.getElementById("js-template");
 const $add = document.getElementById("js-add");
-let responseTitle = "";
-let responseLink = "";
-let responseImage = "";
-let responseDate = "";
-let responseCategory = [];
 
 function addCard(url) {
   document.getElementById("js-add").textContent = null;
@@ -79,23 +74,21 @@ function addCard(url) {
     if (response.length === 0) {
       $add.innerText = "該当する記事はありませんでした";
     } else {
-      response.forEach(el => {
-        dataFormat(el);
+      response.forEach(response => {
+        const cardInformation = formatData(response);
+        console.log(cardInformation.image);
+        createDom(cardInformation);
       });
     }
   });
 }
 
-function dataFormat(response) {
-  responseCategory = [];
-
-  responseTitle = response.title.rendered;
-  responseLink = response.link;
-  responseImage = response._embedded["wp:featuredmedia"][0].source_url;
-
+function formatData(response) {
   let date = new Date(response.date);
-  responseDate =
+  date =
     date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate();
+
+  let responseCategory = [];
 
   response.categories.forEach(function(value) {
     const targetList = categoryList.filter(category => {
@@ -107,18 +100,25 @@ function dataFormat(response) {
     });
   });
 
-  createDom();
+  return {
+    title: response.title.rendered,
+    url: response.link,
+    image: response._embedded["wp:featuredmedia"][0].source_url,
+    createddate: date,
+    categoryList: responseCategory
+  };
 }
 
 // card型で表示するDOM用意
-function createDom() {
+function createDom(response) {
   let clone = $template.firstElementChild.cloneNode(true);
-  clone.getElementsByClassName("article__link")[0].href = responseLink;
-  clone.getElementsByClassName("article__title")[0].innerText = responseTitle;
-  clone.getElementsByClassName("article__image")[0].src = responseImage;
-  clone.getElementsByClassName("article__date")[0].innerText = responseDate;
+  clone.getElementsByClassName("article__link")[0].href = response.url;
+  clone.getElementsByClassName("article__title")[0].innerText = response.title;
+  clone.getElementsByClassName("article__image")[0].src = response.image;
+  clone.getElementsByClassName("article__date")[0].innerText =
+    response.createddate;
 
-  responseCategory.forEach(el => {
+  response.categoryList.forEach(el => {
     let li = document.createElement("li");
     let a = document.createElement("a");
     a.href = el.url;
