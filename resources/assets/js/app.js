@@ -10,12 +10,12 @@ let categoryList = [];
 
 // カテゴリ一覧取得
 requestAjax(CATEGORY_URL, function(response) {
-  response.forEach(function(el) {
-    categoryList.push({
+  categoryList = response.map(el => {
+    return {
       id: el.id,
       name: el.name,
       url: el.link
-    });
+    };
   });
   addSidebarCategoryList();
 });
@@ -88,16 +88,14 @@ function formatData(response) {
   date =
     date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate();
 
-  let responseCategory = [];
-
-  response.categories.forEach(function(value) {
+  const responseCategory = response.categories.map(value => {
     const targetList = categoryList.filter(category => {
       return category.id === value;
     });
-    responseCategory.push({
+    return {
       name: targetList[0].name,
       url: targetList[0].url
-    });
+    };
   });
 
   return {
