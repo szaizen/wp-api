@@ -1,4 +1,5 @@
-import { formatData, createDom } from "./module.js";
+import formatData from "./modules/formatData.js";
+import createDom from "./modules/createDom.js";
 
 const URL = "https://liginc.co.jp";
 const ARTICLE_URL = URL + "/wp-json/wp/v2/posts?_embed";
@@ -96,3 +97,29 @@ function requestAjax(endpoint, callback) {
   xhr.open("GET", endpoint, true);
   xhr.send();
 }
+
+/*
+async function ArequestAjax(endpoint) {
+  var xhr = new XMLHttpRequest();
+  xhr.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      return this.response;
+    }
+  };
+  xhr.responseType = "json";
+  xhr.open("GET", endpoint, true);
+  xhr.send();
+}
+
+ArequestAjax(CATEGORY_URL).then(result => {
+  console.log(result);
+});
+
+async function fn() {
+  return 42;
+}
+
+fn().then(result => {
+  console.log(result);
+});
+*/

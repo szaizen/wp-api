@@ -1,30 +1,5 @@
-// レスポンスデータを整形
-export function formatData(response, categoryList) {
-  let date = new Date(response.date);
-  date =
-    date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate();
-
-  const responseCategory = response.categories.map(value => {
-    const targetList = categoryList.filter(category => {
-      return category.id === value;
-    });
-    return {
-      name: targetList[0].name,
-      url: targetList[0].url
-    };
-  });
-
-  return {
-    title: response.title.rendered,
-    url: response.link,
-    image: response._embedded["wp:featuredmedia"][0].source_url,
-    createddate: date,
-    categoryList: responseCategory
-  };
-}
-
 // card型で表示するDOM用意
-export function createDom(response) {
+export default function createDom(response) {
   const $template = document.getElementById("js-template");
   const clone = $template.firstElementChild.cloneNode(true);
   clone.getElementsByClassName("article__link")[0].href = response.url;
