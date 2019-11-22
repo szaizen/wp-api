@@ -1,3 +1,5 @@
+import { formatData, createDom } from "./module.js";
+
 const URL = "https://liginc.co.jp";
 const ARTICLE_URL = URL + "/wp-json/wp/v2/posts?_embed";
 const CATEGORY_URL = URL + "/wp-json/wp/v2/categories?per_page=100";
@@ -26,7 +28,6 @@ function addSidebarCategoryList() {
   $ul.innerHTML = categoryList
     .map(item => `<li data-categoryid="${item.id}">${item.name}</li>`)
     .join("");
-
   $ul.addEventListener("click", e => {
     categorySearch(e.target.dataset.categoryid);
   });
@@ -61,9 +62,7 @@ document.getElementById("js-search-btn").addEventListener("click", () => {
  * 記事表示
  *------------------------------------*/
 
-const $template = document.getElementById("js-template");
 const $add = document.getElementById("js-add");
-
 // 記事追加
 function addCard(url) {
   document.getElementById("js-add").textContent = null;
@@ -73,55 +72,12 @@ function addCard(url) {
       $add.innerText = "該当する記事はありませんでした";
     } else {
       response.forEach(response => {
-        const cardInformation = formatData(response);
-        createDom(cardInformation);
+        const cardInformation = formatData(response, categoryList);
+        const cardHtml = createDom(cardInformation);
+        $add.appendChild(cardHtml);
       });
     }
   });
-}
-
-// レスポンスデータを整形
-function formatData(response) {
-  let date = new Date(response.date);
-  date =
-    date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate();
-
-  const responseCategory = response.categories.map(value => {
-    const targetList = categoryList.filter(category => {
-      return category.id === value;
-    });
-    return {
-      name: targetList[0].name,
-      url: targetList[0].url
-    };
-  });
-
-  return {
-    title: response.title.rendered,
-    url: response.link,
-    image: response._embedded["wp:featuredmedia"][0].source_url,
-    createddate: date,
-    categoryList: responseCategory
-  };
-}
-
-// card型で表示するDOM用意
-function createDom(response) {
-  let clone = $template.firstElementChild.cloneNode(true);
-  clone.getElementsByClassName("article__link")[0].href = response.url;
-  clone.getElementsByClassName("article__title")[0].innerText = response.title;
-  clone.getElementsByClassName("article__image")[0].src = response.image;
-  clone.getElementsByClassName("article__date")[0].innerText =
-    response.createddate;
-
-  let $ul = clone.getElementsByClassName("article__category")[0];
-  $ul.innerHTML = response.categoryList
-    .map(
-      item => `<li><a target="_blank" href="${item.url}">${item.name}</a></li>`
-    )
-    .join("");
-
-  $add.appendChild(clone);
 }
 
 /* ------------------------------------
