@@ -1,27 +1,71 @@
 import formatData from "./modules/formatData.js";
 import createDom from "./modules/createDom.js";
 
+const $add = document.getElementById("js-add");
+
 const URL = "https://liginc.co.jp";
 const ARTICLE_URL = URL + "/wp-json/wp/v2/posts?_embed";
 const CATEGORY_URL = URL + "/wp-json/wp/v2/categories?per_page=100";
-
 let categoryList = [];
 
-/* ------------------------------------
- *  カテゴリー一覧取得し、サイドバーに表示
- *------------------------------------*/
-
-// カテゴリ一覧取得
-requestAjax(CATEGORY_URL, function(response) {
-  categoryList = response.map(el => {
-    return {
-      id: el.id,
-      name: el.name,
-      url: el.link
-    };
+// カテゴリー
+requestApi(CATEGORY_URL).then(result => {
+  categoryList = result.map(el => {
+    return { id: el.id, name: el.name, url: el.link };
   });
   addSidebarCategoryList();
 });
+
+// 記事一覧
+requestApi(ARTICLE_URL).then(result => {
+  addCard(result);
+});
+
+/* ------------------------------------
+ * 検索ボタンクリック
+ *------------------------------------*/
+document.getElementById("js-search-btn").addEventListener("click", () => {
+  let searchUrl =
+    ARTICLE_URL + "&search=" + document.getElementById("js-search-text").value;
+  searchUrl = encodeURI(searchUrl);
+
+  requestApi(searchUrl).then(result => {
+    addCard(result);
+  });
+});
+
+/* ------------------------------------
+ * カテゴリーボタンクリック
+ *------------------------------------*/
+function categorySearch(id) {
+  let categoryListURL = ARTICLE_URL + "&categories=" + id;
+  requestApi(categoryListURL).then(result => {
+    addCard(result);
+  });
+}
+
+/* ------------------------------------
+ * 関数
+ *------------------------------------*/
+
+// 記事追加
+function addCard(json) {
+  document.getElementById("js-add").textContent = null;
+
+  if (json.length === 0) {
+    showError("該当する記事はありませんでした");
+  } else {
+    json.forEach(json => {
+      const cardInformation = formatData(json, categoryList);
+      const cardHtml = createDom(cardInformation);
+      $add.appendChild(cardHtml);
+    });
+  }
+}
+
+function showError(message) {
+  $add.innerText = message;
+}
 
 // サイドバーにカテゴリー一覧表示
 function addSidebarCategoryList() {
@@ -34,92 +78,21 @@ function addSidebarCategoryList() {
   });
 }
 
-// クリックされた時の処理
-function categorySearch(id) {
-  console.log(id);
-  let categoryListURL = ARTICLE_URL + "&categories=" + id;
-  addCard(categoryListURL);
-}
-
-/* ------------------------------------
- * 記事一覧取得
- *------------------------------------*/
-
-addCard(ARTICLE_URL);
-
-/* ------------------------------------
- * 検索結果を表示
- *------------------------------------*/
-
-document.getElementById("js-search-btn").addEventListener("click", () => {
-  let searchUrl =
-    ARTICLE_URL + "&search=" + document.getElementById("js-search-text").value;
-  searchUrl = encodeURI(searchUrl);
-
-  addCard(searchUrl);
-});
-
-/* ------------------------------------
- * 記事表示
- *------------------------------------*/
-
-const $add = document.getElementById("js-add");
-// 記事追加
-function addCard(url) {
-  document.getElementById("js-add").textContent = null;
-
-  requestAjax(url, function(response) {
-    if (response.length === 0) {
-      $add.innerText = "該当する記事はありませんでした";
-    } else {
-      response.forEach(response => {
-        const cardInformation = formatData(response, categoryList);
-        const cardHtml = createDom(cardInformation);
-        $add.appendChild(cardHtml);
-      });
-    }
+// API取得
+function get(url) {
+  return new Promise(resolve => {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        resolve(this.response);
+      }
+    };
+    xhr.responseType = "json";
+    xhr.open("GET", url, true);
+    xhr.send();
   });
 }
-
-/* ------------------------------------
- * 関数
- *------------------------------------*/
-
-// API取得
-function requestAjax(endpoint, callback) {
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      callback(this.response);
-    }
-  };
-  xhr.responseType = "json";
-  xhr.open("GET", endpoint, true);
-  xhr.send();
+async function requestApi(url) {
+  const result = await get(url);
+  return result;
 }
-
-/*
-async function ArequestAjax(endpoint) {
-  var xhr = new XMLHttpRequest();
-  xhr.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      return this.response;
-    }
-  };
-  xhr.responseType = "json";
-  xhr.open("GET", endpoint, true);
-  xhr.send();
-}
-
-ArequestAjax(CATEGORY_URL).then(result => {
-  console.log(result);
-});
-
-async function fn() {
-  return 42;
-}
-
-fn().then(result => {
-  console.log(result);
-});
-*/
