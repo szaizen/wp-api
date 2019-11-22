@@ -4,22 +4,131 @@ const CATEGORY_URL = URL + "/wp-json/wp/v2/categories?per_page=100";
 
 let categoryList = [];
 
+/* ------------------------------------
+ *  カテゴリー一覧取得し、サイドバーに表示
+ *------------------------------------*/
+
 // カテゴリ一覧取得
 requestAjax(CATEGORY_URL, function(response) {
-  response.forEach(function(el) {
-    categoryList.push({
+  categoryList = response.map(el => {
+    return {
       id: el.id,
       name: el.name,
       url: el.link
-    });
+    };
   });
+  addSidebarCategoryList();
 });
 
-// 記事一覧取得
-requestAjax(ARTICLE_URL, function(response) {
-  addCard(response);
+// サイドバーにカテゴリー一覧表示
+function addSidebarCategoryList() {
+  let $ul = document.getElementById("js-category-list");
+  $ul.innerHTML = categoryList
+    .map(item => `<li data-categoryid="${item.id}">${item.name}</li>`)
+    .join("");
+
+  $ul.addEventListener("click", e => {
+    categorySearch(e.target.dataset.categoryid);
+  });
+}
+
+// クリックされた時の処理
+function categorySearch(id) {
+  console.log(id);
+  let categoryListURL = ARTICLE_URL + "&categories=" + id;
+  addCard(categoryListURL);
+}
+
+/* ------------------------------------
+ * 記事一覧取得
+ *------------------------------------*/
+
+addCard(ARTICLE_URL);
+
+/* ------------------------------------
+ * 検索結果を表示
+ *------------------------------------*/
+
+document.getElementById("js-search-btn").addEventListener("click", () => {
+  let searchUrl =
+    ARTICLE_URL + "&search=" + document.getElementById("js-search-text").value;
+  searchUrl = encodeURI(searchUrl);
+
+  addCard(searchUrl);
 });
 
+/* ------------------------------------
+ * 記事表示
+ *------------------------------------*/
+
+const $template = document.getElementById("js-template");
+const $add = document.getElementById("js-add");
+
+// 記事追加
+function addCard(url) {
+  document.getElementById("js-add").textContent = null;
+
+  requestAjax(url, function(response) {
+    if (response.length === 0) {
+      $add.innerText = "該当する記事はありませんでした";
+    } else {
+      response.forEach(response => {
+        const cardInformation = formatData(response);
+        createDom(cardInformation);
+      });
+    }
+  });
+}
+
+// レスポンスデータを整形
+function formatData(response) {
+  let date = new Date(response.date);
+  date =
+    date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate();
+
+  const responseCategory = response.categories.map(value => {
+    const targetList = categoryList.filter(category => {
+      return category.id === value;
+    });
+    return {
+      name: targetList[0].name,
+      url: targetList[0].url
+    };
+  });
+
+  return {
+    title: response.title.rendered,
+    url: response.link,
+    image: response._embedded["wp:featuredmedia"][0].source_url,
+    createddate: date,
+    categoryList: responseCategory
+  };
+}
+
+// card型で表示するDOM用意
+function createDom(response) {
+  let clone = $template.firstElementChild.cloneNode(true);
+  clone.getElementsByClassName("article__link")[0].href = response.url;
+  clone.getElementsByClassName("article__title")[0].innerText = response.title;
+  clone.getElementsByClassName("article__image")[0].src = response.image;
+  clone.getElementsByClassName("article__date")[0].innerText =
+    response.createddate;
+
+  let $ul = clone.getElementsByClassName("article__category")[0];
+  $ul.innerHTML = response.categoryList
+    .map(
+      item => `<li><a target="_blank" href="${item.url}">${item.name}</a></li>`
+    )
+    .join("");
+
+  $add.appendChild(clone);
+}
+
+/* ------------------------------------
+ * 関数
+ *------------------------------------*/
+
+// API取得
 function requestAjax(endpoint, callback) {
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = function() {
@@ -30,44 +139,4 @@ function requestAjax(endpoint, callback) {
   xhr.responseType = "json";
   xhr.open("GET", endpoint, true);
   xhr.send();
-}
-
-function addCard(response) {
-  const $template = document.getElementById("js-template");
-  const $add = document.getElementById("js-add");
-  const DISPLAYED_NUMBER = 8;
-
-  for (var i = 0; i < DISPLAYED_NUMBER; i++) {
-    const clone = $template.firstElementChild.cloneNode(true);
-    clone.getElementsByClassName("article__link")[0].href = response[i].link;
-    clone.getElementsByClassName("article__title")[0].innerText =
-      response[i].title.rendered;
-    clone.getElementsByClassName("article__image")[0].src =
-      response[i]._embedded["wp:featuredmedia"][0].source_url;
-
-    // categoryの名前検索
-    response[i].categories.forEach(function(value) {
-      const targetList = categoryList.filter(category => {
-        return category.id === value;
-      });
-      const li = document.createElement("li");
-      const a = document.createElement("a");
-      a.href = targetList[0].url;
-      a.target = "_blank";
-      a.innerText = targetList[0].name;
-
-      li.appendChild(a);
-
-      clone.getElementsByClassName("article__category")[0].appendChild(li);
-    });
-
-    // 日付変換
-    let date = new Date(response[i].date);
-    let formatDate =
-      date.getFullYear() + "." + (date.getMonth() + 1) + "." + date.getDate();
-
-    clone.getElementsByClassName("article__date")[0].innerText = formatDate;
-
-    $add.appendChild(clone);
-  }
 }

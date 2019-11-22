@@ -1,7 +1,13 @@
 <% var title = 'wp api' %><%- include('/partials/header', { title }) -%>
 
-<div class="container">
-  <div class="notification">
+<div class="container main">
+  <aside class="menu main__sidebar">
+    <p class="menu-label">
+      category
+    </p>
+    <ul id="js-category-list" class="menu-list"></ul>
+  </aside>
+  <div class="notification main__content">
     <div id="js-add" class="card__list"></div>
   </div>
 </div>
