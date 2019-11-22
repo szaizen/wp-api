@@ -49,13 +49,13 @@ addCard(ARTICLE_URL);
  * 検索結果を表示
  *------------------------------------*/
 
-document.getElementById("js-search-btn").onclick = function() {
+document.getElementById("js-search-btn").addEventListener("click", () => {
   let searchUrl =
     ARTICLE_URL + "&search=" + document.getElementById("js-search-text").value;
   searchUrl = encodeURI(searchUrl);
 
   addCard(searchUrl);
-};
+});
 
 /* ------------------------------------
  * 記事表示
