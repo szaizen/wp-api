@@ -69,7 +69,12 @@ body {
 }
 
 .menu-list {
-  & a {
-    font-size: 13px;
+  & li {
+    font-size: 14px;
+    margin-bottom: 3px;
+    cursor: pointer;
+    &:hover {
+      opacity: 0.6;
+    }
   }
 }

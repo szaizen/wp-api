@@ -22,16 +22,13 @@ requestAjax(CATEGORY_URL, function(response) {
 
 // サイドバーにカテゴリー一覧表示
 function addSidebarCategoryList() {
-  categoryList.forEach(function(el) {
-    const li = document.createElement("li");
-    const a = document.createElement("a");
-    a.className = "js-category-id";
-    a.onclick = function() {
-      categorySearch(el.id);
-    };
-    a.innerText = el.name;
-    li.appendChild(a);
-    document.getElementById("js-category-list").appendChild(li);
+  let $ul = document.getElementById("js-category-list");
+  $ul.innerHTML = categoryList
+    .map(item => `<li data-categoryid="${item.id}">${item.name}</li>`)
+    .join("");
+
+  $ul.addEventListener("click", e => {
+    categorySearch(e.target.dataset.categoryid);
   });
 }
 
@@ -67,6 +64,7 @@ document.getElementById("js-search-btn").onclick = function() {
 const $template = document.getElementById("js-template");
 const $add = document.getElementById("js-add");
 
+// 記事追加
 function addCard(url) {
   document.getElementById("js-add").textContent = null;
 
@@ -76,13 +74,13 @@ function addCard(url) {
     } else {
       response.forEach(response => {
         const cardInformation = formatData(response);
-        console.log(cardInformation.image);
         createDom(cardInformation);
       });
     }
   });
 }
 
+// レスポンスデータを整形
 function formatData(response) {
   let date = new Date(response.date);
   date =
@@ -116,15 +114,12 @@ function createDom(response) {
   clone.getElementsByClassName("article__date")[0].innerText =
     response.createddate;
 
-  response.categoryList.forEach(el => {
-    let li = document.createElement("li");
-    let a = document.createElement("a");
-    a.href = el.url;
-    a.target = "_blank";
-    a.innerText = el.name;
-    li.appendChild(a);
-    clone.getElementsByClassName("article__category")[0].appendChild(li);
-  });
+  let $ul = clone.getElementsByClassName("article__category")[0];
+  $ul.innerHTML = response.categoryList
+    .map(
+      item => `<li><a target="_blank" href="${item.url}">${item.name}</a></li>`
+    )
+    .join("");
 
   $add.appendChild(clone);
 }
