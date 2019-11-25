@@ -78,3 +78,14 @@ body {
     max-width: 1000px;
   }
 }
+
+/* Bulma style */
+.pagination {
+  margin: 20px 0 50px;
+  &-list {
+    justify-content: center;
+  }
+  &-link {
+    background-color: #fff;
+  }
+}
