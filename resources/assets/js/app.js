@@ -1,5 +1,5 @@
-import formatData from "./modules/formatData.js";
-import createDom from "./modules/createDom.js";
+import formatData from "./modules/format-data.js";
+import createDom from "./modules/create-dom.js";
 
 const $add = document.getElementById("js-add");
 
