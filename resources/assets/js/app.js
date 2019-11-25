@@ -37,11 +37,10 @@ document.getElementById("js-search-btn").addEventListener("click", () => {
 /* ------------------------------------
  * カテゴリーボタンクリック
  *------------------------------------*/
-function categorySearch(id) {
+async function categorySearch(id) {
   let categoryListURL = ARTICLE_URL + "&categories=" + id;
-  requestApi(categoryListURL).then(result => {
-    addCard(result);
-  });
+  const result = await requestApi(categoryListURL);
+  addCard(result);
 }
 
 /* ------------------------------------
@@ -79,7 +78,7 @@ function addSidebarCategoryList() {
 }
 
 // API取得
-function get(url) {
+function requestApi(url) {
   return new Promise(resolve => {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
@@ -91,8 +90,4 @@ function get(url) {
     xhr.open("GET", url, true);
     xhr.send();
   });
-}
-async function requestApi(url) {
-  const result = await get(url);
-  return result;
 }
