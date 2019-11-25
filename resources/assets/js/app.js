@@ -1,14 +1,12 @@
 import formatData from "./modules/format-data.js";
 import createDom from "./modules/create-dom.js";
+import { articleTotal, pagesTotal, requestApi } from "./modules/request-api.js";
 
 const $add = document.getElementById("js-add");
 const $pagenation = document.getElementById("js-pagination");
 
 let categoryList = [];
 let currentPage = 1; // 現在のページ番号
-
-let articleTotal = 0; // 総記事数
-let pagesTotal = 0; // 総ページ数
 
 // API URL
 const URL = "https://liginc.co.jp";
@@ -106,25 +104,6 @@ function addSidebarCategoryList() {
 }
 
 // API取得
-function requestApi(url) {
-  let $body = document.getElementById("body");
-  $body.classList.add("loading");
-
-  return new Promise(resolve => {
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        articleTotal = this.getResponseHeader("x-wp-total");
-        pagesTotal = this.getResponseHeader("x-wp-totalpages");
-        $body.classList.remove("loading");
-        resolve(this.response);
-      }
-    };
-    xhr.responseType = "json";
-    xhr.open("GET", url, true);
-    xhr.send();
-  });
-}
 
 // ページネーション更新
 function addPagenaition(currentPageNumber) {
