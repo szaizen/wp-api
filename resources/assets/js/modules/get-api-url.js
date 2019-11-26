@@ -1,12 +1,9 @@
-import {
-  API_URL,
+export default function getApiUrl(
   currentType,
   currentPage,
   searchText,
   cateogyrId
-} from "../app.js";
-
-export default function getApiUrl() {
+) {
   var apiUrlParam = "";
 
   if (currentType === "category") {
@@ -20,5 +17,5 @@ export default function getApiUrl() {
 
   apiUrlParam += "&page=" + currentPage;
 
-  return API_URL + apiUrlParam;
+  return apiUrlParam;
 }
