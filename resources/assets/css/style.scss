@@ -2,19 +2,17 @@ body {
   background-color: whitesmoke;
   opacity: 1;
 }
-.loading {
-  pointer-events: none;
-  .main {
-    opacity: 0.5;
-  }
-  .loading__image {
-    display: block;
-  }
-}
 
 .card {
   width: 300px;
   margin-bottom: 40px;
+  transition: all 0.5s ease;
+
+  &:hover {
+    transform: translate(0px, -4px);
+    box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.3),
+      0 0px 0 1px rgba(10, 10, 10, 0.05);
+  }
 
   &__list {
     display: flex;
@@ -97,5 +95,15 @@ body {
   }
   &-link {
     background-color: #fff;
+  }
+}
+
+.loading {
+  pointer-events: none;
+  .main {
+    opacity: 0.5;
+  }
+  .loading__image {
+    display: block;
   }
 }
