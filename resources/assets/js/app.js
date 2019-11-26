@@ -3,7 +3,7 @@ import createDom from "./modules/create-dom.js";
 import getArticleList from "./modules/get-article-list.js";
 import getCategoryList from "./modules/get-category-list.js";
 import getApiUrl from "./modules/get-api-url.js";
-import Pagenation from "./modules/pagenation.js";
+import Pagenation from "./class/pagenation.js";
 
 const $add = document.getElementById("js-add");
 const $pagenation = document.getElementById("js-pagination");
