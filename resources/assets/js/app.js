@@ -1,14 +1,25 @@
 import formatData from "./modules/format-data.js";
 import createDom from "./modules/create-dom.js";
+import { articleTotal, pagesTotal, requestApi } from "./modules/request-api.js";
+import getApiUrl from "./modules/get-api-url.js";
 
 const $add = document.getElementById("js-add");
+const $pagenation = document.getElementById("js-pagination");
 
-const URL = "https://liginc.co.jp";
-const ARTICLE_URL = URL + "/wp-json/wp/v2/posts?_embed";
-const CATEGORY_URL = URL + "/wp-json/wp/v2/categories?per_page=100";
 let categoryList = [];
 
-// カテゴリー
+export let currentType = "post"; // post or category or search
+export let currentPage = 1; // 現在のページ番号
+export let searchText = "";
+export let cateogyrId = "";
+
+// API URL
+export const API_URL =
+  "https://liginc.co.jp/wp-json/wp/v2/posts?_embed&per_page=9";
+const CATEGORY_URL =
+  "https://liginc.co.jp/wp-json/wp/v2/categories?per_page=100";
+
+// カテゴリー取得、サイドバー更新
 requestApi(CATEGORY_URL).then(result => {
   categoryList = result.map(el => {
     return { id: el.id, name: el.name, url: el.link };
@@ -17,40 +28,48 @@ requestApi(CATEGORY_URL).then(result => {
 });
 
 // 記事一覧
-requestApi(ARTICLE_URL).then(result => {
-  addCard(result);
-});
+addCard();
 
 /* ------------------------------------
- * 検索ボタンクリック
+ * クリックイベント
  *------------------------------------*/
+
+// 検索時
 document.getElementById("js-search-btn").addEventListener("click", () => {
-  let searchUrl =
-    ARTICLE_URL + "&search=" + document.getElementById("js-search-text").value;
-  searchUrl = encodeURI(searchUrl);
-
-  requestApi(searchUrl).then(result => {
-    addCard(result);
-  });
+  currentType = "search";
+  currentPage = 1;
+  searchText = document.getElementById("js-search-text").value;
+  addCard();
 });
 
-/* ------------------------------------
- * カテゴリーボタンクリック
- *------------------------------------*/
+// カテゴリーボタン
 async function categorySearch(id) {
-  let categoryListURL = ARTICLE_URL + "&categories=" + id;
-  const result = await requestApi(categoryListURL);
-  addCard(result);
+  currentType = "category";
+  addCard();
 }
+
+// ページネーション
+$pagenation.addEventListener("click", e => {
+  let clickPage = Number(e.target.dataset.pagenumber);
+
+  currentPage = clickPage;
+  addCard();
+
+  addPagenaition(clickPage);
+});
 
 /* ------------------------------------
  * 関数
  *------------------------------------*/
 
 // 記事追加
-function addCard(json) {
-  document.getElementById("js-add").textContent = null;
+async function addCard() {
+  let url = encodeURI(getApiUrl());
+  const json = await requestApi(url);
 
+  addPagenaition(currentPage);
+
+  document.getElementById("js-add").textContent = null;
   if (json.length === 0) {
     showError("該当する記事はありませんでした");
   } else {
@@ -59,9 +78,15 @@ function addCard(json) {
       const cardHtml = createDom(cardInformation);
       $add.appendChild(cardHtml);
     });
+    addTotal();
   }
 }
 
+function addTotal() {
+  document.getElementById("js-article-total").innerText = articleTotal;
+}
+
+// エラー表示
 function showError(message) {
   $add.innerText = message;
 }
@@ -73,21 +98,38 @@ function addSidebarCategoryList() {
     .map(item => `<li data-categoryid="${item.id}">${item.name}</li>`)
     .join("");
   $ul.addEventListener("click", e => {
-    categorySearch(e.target.dataset.categoryid);
+    cateogyrId = e.target.dataset.categoryid;
+    currentPage = 1;
+    categorySearch();
   });
 }
 
-// API取得
-function requestApi(url) {
-  return new Promise(resolve => {
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-      if (this.readyState == 4 && this.status == 200) {
-        resolve(this.response);
-      }
-    };
-    xhr.responseType = "json";
-    xhr.open("GET", url, true);
-    xhr.send();
-  });
+// ページネーション更新
+function addPagenaition(currentPageNumber) {
+  let pagenationStartNumber = currentPageNumber - 2; // 最初のページ番号
+  let pagenationEndNumber = currentPageNumber + 2; // 最後のページ番号
+
+  if (currentPageNumber <= 2) {
+    pagenationStartNumber = 1;
+    pagenationEndNumber = 5;
+  } else if (currentPageNumber >= pagesTotal - 2 && currentPageNumber >= 5) {
+    pagenationStartNumber = pagesTotal - 4;
+    pagenationEndNumber = pagesTotal;
+  }
+
+  if (pagesTotal < 5) {
+    pagenationEndNumber = pagesTotal;
+  }
+
+  let pagenationHtml = "";
+  $pagenation.innerHTML = "";
+
+  for (var i = pagenationStartNumber; i <= pagenationEndNumber; i++) {
+    let pagenationClass = "pagination-link";
+    if (i === currentPageNumber) {
+      pagenationClass = "pagination-link is-current";
+    }
+    pagenationHtml += `<li><a data-pagenumber="${i}" class="${pagenationClass}">${i}</a></li>`;
+  }
+  $pagenation.innerHTML = pagenationHtml;
 }

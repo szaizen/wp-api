@@ -1,5 +1,15 @@
 body {
   background-color: whitesmoke;
+  opacity: 1;
+}
+.loading {
+  pointer-events: none;
+  .main {
+    opacity: 0.5;
+  }
+  .loading__image {
+    display: block;
+  }
 }
 
 .card {
@@ -76,5 +86,16 @@ body {
   }
   &__content {
     max-width: 1000px;
+  }
+}
+
+/* Bulma style */
+.pagination {
+  margin: 20px 0 50px;
+  &-list {
+    justify-content: center;
+  }
+  &-link {
+    background-color: #fff;
   }
 }
