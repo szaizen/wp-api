@@ -6,13 +6,16 @@ import Pagenation from "./modules/pagenation.js";
 
 const $add = document.getElementById("js-add");
 const $pagenation = document.getElementById("js-pagination");
+const $search = document.getElementById("js-search-btn");
 
 let categoryList = [];
 
-let currentType = "post"; // post or category or search
-let currentPage = 1; // 現在のページ番号
-let searchText = "";
-let cateogyrId = "";
+let currentData = {
+  type: "post", // post or category or search
+  page: 1, // 現在のページ番号
+  searchText: "", // 検索時のワード
+  cateogyrId: "" // カテゴリー検索時のID
+};
 
 // API URL
 const API_URL = "https://liginc.co.jp/wp-json/wp/v2/posts?_embed&per_page=9";
@@ -30,10 +33,10 @@ addCard();
  *------------------------------------*/
 
 // 検索時
-document.getElementById("js-search-btn").addEventListener("click", () => {
-  currentType = "search";
-  currentPage = 1;
-  searchText = document.getElementById("js-search-text").value;
+$search.addEventListener("click", () => {
+  currentData.type = "search";
+  currentData.page = 1;
+  currentData.searchText = document.getElementById("js-search-text").value;
   addCard();
 });
 
@@ -41,7 +44,7 @@ document.getElementById("js-search-btn").addEventListener("click", () => {
 
 $pagenation.addEventListener("click", e => {
   let clickPage = Number(e.target.dataset.pagenumber);
-  currentPage = clickPage;
+  currentData.page = clickPage;
   addCard();
 });
 
@@ -65,22 +68,19 @@ function addSidebarCategoryList() {
     .map(item => `<li data-categoryid="${item.id}">${item.name}</li>`)
     .join("");
   $ul.addEventListener("click", e => {
-    cateogyrId = e.target.dataset.categoryid;
-    currentPage = 1;
-    currentType = "category";
+    currentData.cateogyrId = e.target.dataset.categoryid;
+    currentData.page = 1;
+    currentData.type = "category";
     addCard();
   });
 }
 
 // 記事追加
 async function addCard() {
-  let url =
-    API_URL +
-    encodeURI(getApiUrl(currentType, currentPage, searchText, cateogyrId));
+  let url = API_URL + encodeURI(getApiUrl(currentData));
   const json = await requestApi(url);
 
-  // addPagenaition(currentPage);
-  new Pagenation(currentPage, 5, pagesTotal, $pagenation);
+  new Pagenation(currentData.page, 5, pagesTotal, $pagenation);
 
   document.getElementById("js-add").textContent = null;
   if (json.length === 0) {

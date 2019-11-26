@@ -1,21 +1,17 @@
-export default function getApiUrl(
-  currentType,
-  currentPage,
-  searchText,
-  cateogyrId
-) {
-  var apiUrlParam = "";
+export default function getApiUrl(currentData) {
+  let apiUrlParam = "";
 
-  if (currentType === "category") {
+  if (currentData.type === "category") {
     // カテゴリーで絞る
-    apiUrlParam += "&categories=" + cateogyrId;
-  }
-  if (currentType === "search") {
-    // 検索ワードで絞る
-    apiUrlParam += "&search=" + searchText;
+    apiUrlParam += "&categories=" + currentData.cateogyrId;
   }
 
-  apiUrlParam += "&page=" + currentPage;
+  if (currentData.type === "search") {
+    // 検索ワードで絞る
+    apiUrlParam += "&search=" + currentData.searchText;
+  }
+
+  apiUrlParam += "&page=" + currentData.page;
 
   return apiUrlParam;
 }
