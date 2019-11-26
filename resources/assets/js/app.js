@@ -1,6 +1,7 @@
 import formatData from "./modules/format-data.js";
 import createDom from "./modules/create-dom.js";
-import { articleTotal, pagesTotal, requestApi } from "./modules/request-api.js";
+import getArticleList from "./modules/get-article-list.js";
+import getCategoryList from "./modules/get-category-list.js";
 import getApiUrl from "./modules/get-api-url.js";
 import Pagenation from "./modules/pagenation.js";
 
@@ -9,6 +10,7 @@ const $pagenation = document.getElementById("js-pagination");
 const $search = document.getElementById("js-search-btn");
 
 let categoryList = [];
+let articleTotal = 0;
 
 let currentData = {
   type: "post", // post or category or search
@@ -54,7 +56,7 @@ $pagenation.addEventListener("click", e => {
 
 // カテゴリー追加
 async function addCategory() {
-  let result = await requestApi(CATEGORY_URL);
+  let result = await getCategoryList(CATEGORY_URL);
   categoryList = result.map(el => {
     return { id: el.id, name: el.name, url: el.link };
   });
@@ -78,16 +80,20 @@ function addSidebarCategoryList() {
 // 記事追加
 async function addCard() {
   let url = API_URL + encodeURI(getApiUrl(currentData));
-  const json = await requestApi(url);
 
-  new Pagenation(currentData.page, 5, pagesTotal, $pagenation);
+  const result = await getArticleList(url);
+  const response = result.response;
+  articleTotal = result.articleTotal;
+
+  // ページネーション更新
+  new Pagenation(currentData.page, 5, result.pagesTotal, $pagenation);
 
   document.getElementById("js-add").textContent = null;
-  if (json.length === 0) {
+  if (response.length === 0) {
     showError("該当する記事はありませんでした");
   } else {
-    json.forEach(json => {
-      const cardInformation = formatData(json, categoryList);
+    response.forEach(response => {
+      const cardInformation = formatData(response, categoryList);
       const cardHtml = createDom(cardInformation);
       $add.appendChild(cardHtml);
     });
