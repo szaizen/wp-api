@@ -1,5 +1,5 @@
 // API
-export default function getCategoryList(url) {
+export default function requestApi(url) {
   let $body = document.getElementById("body");
   $body.classList.add("loading");
 

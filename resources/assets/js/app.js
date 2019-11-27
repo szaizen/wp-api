@@ -1,16 +1,17 @@
 import formatData from "./modules/format-data.js";
 import createDom from "./modules/create-dom.js";
 import getArticleList from "./modules/get-article-list.js";
-import getCategoryList from "./modules/get-category-list.js";
+import requestApi from "./modules/request-api.js";
 import getApiUrl from "./modules/get-api-url.js";
 import Pagenation from "./class/pagenation.js";
+import Article from "./class/category.js";
+import Category from "./class/category.js";
 
 const $add = document.getElementById("js-add");
 const $pagenation = document.getElementById("js-pagination");
 const $search = document.getElementById("js-search-btn");
 
 let categoryList = [];
-let articleTotal = 0;
 
 let currentData = {
   type: "post", // post or category or search
@@ -43,7 +44,6 @@ $search.addEventListener("click", () => {
 });
 
 // ページネーション
-
 $pagenation.addEventListener("click", e => {
   let clickPage = Number(e.target.dataset.pagenumber);
   currentData.page = clickPage;
@@ -56,7 +56,7 @@ $pagenation.addEventListener("click", e => {
 
 // カテゴリー追加
 async function addCategory() {
-  let result = await getCategoryList(CATEGORY_URL);
+  let result = await requestApi(CATEGORY_URL);
   categoryList = result.map(el => {
     return { id: el.id, name: el.name, url: el.link };
   });
@@ -79,34 +79,24 @@ function addSidebarCategoryList() {
 
 // 記事追加
 async function addCard() {
-  let url = API_URL + encodeURI(getApiUrl(currentData));
+  let url = API_URL + encodeURI(getApiUrl(currentData)); // アクセスするAPIURLを生成
+  let result = await getArticleList(url); // データ取得
+  let response = result.response; // データ内からresponseを取り出す
+  let articleTotal = result.articleTotal; // データ内から総記事数を取り出す
 
-  const result = await getArticleList(url);
-  const response = result.response;
-  articleTotal = result.articleTotal;
-
-  // ページネーション更新
-  new Pagenation(currentData.page, 5, result.pagesTotal, $pagenation);
-
-  document.getElementById("js-add").textContent = null;
+  $add.textContent = null; // HTMLリセット
   if (response.length === 0) {
-    showError("該当する記事はありませんでした");
+    $add.innerText = "該当する記事はありませんでした";
   } else {
     response.forEach(response => {
-      const cardInformation = formatData(response, categoryList);
-      const cardHtml = createDom(cardInformation);
-      $add.appendChild(cardHtml);
+      const cardInformation = formatData(response, categoryList); // データを整形
+      const cardHtml = createDom(cardInformation); // HTML作成
+      $add.appendChild(cardHtml); // HTML書き込み
     });
-    addTotal();
   }
-}
 
-// 記事総件数 追加
-function addTotal() {
+  // 記事総件数 追加
   document.getElementById("js-article-total").innerText = articleTotal;
-}
-
-// エラー表示
-function showError(message) {
-  $add.innerText = message;
+  // ページネーション更新
+  new Pagenation(currentData.page, 5, result.pagesTotal, $pagenation);
 }
