@@ -85,11 +85,11 @@ async function addCard() {
   if (response.length === 0) {
     $add.innerText = "該当する記事はありませんでした";
   } else {
-    response.forEach(response => {
-      const cardInformation = formatData(response, categoryList); // データを整形
+    for (const value of response) {
+      const cardInformation = formatData(value, categoryList); // データを整形
       const cardHtml = createDom(cardInformation); // HTML作成
       $add.appendChild(cardHtml); // HTML書き込み
-    });
+    }
   }
 
   // 記事総件数 追加
