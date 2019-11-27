@@ -14,10 +14,15 @@ export default function formatData(response, categoryList) {
     };
   });
 
+  let image = "";
+  if (response._embedded["wp:featuredmedia"] !== undefined) {
+    image = response._embedded["wp:featuredmedia"][0].source_url;
+  }
+
   return {
     title: response.title.rendered,
     url: response.link,
-    image: response._embedded["wp:featuredmedia"][0].source_url,
+    image: image,
     createddate: date,
     categoryList: responseCategory
   };
