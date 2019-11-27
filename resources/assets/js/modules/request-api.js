@@ -8,7 +8,7 @@ export default function requestApi(url) {
     xhr.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         $body.classList.remove("loading");
-        resolve(this.response);
+        resolve(this);
       }
     };
     xhr.responseType = "json";

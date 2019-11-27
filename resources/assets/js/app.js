@@ -1,11 +1,8 @@
 import formatData from "./modules/format-data.js";
 import createDom from "./modules/create-dom.js";
-import getArticleList from "./modules/get-article-list.js";
 import requestApi from "./modules/request-api.js";
 import getApiUrl from "./modules/get-api-url.js";
 import Pagenation from "./class/pagenation.js";
-import Article from "./class/category.js";
-import Category from "./class/category.js";
 
 const $add = document.getElementById("js-add");
 const $pagenation = document.getElementById("js-pagination");
@@ -57,7 +54,7 @@ $pagenation.addEventListener("click", e => {
 // カテゴリー追加
 async function addCategory() {
   let result = await requestApi(CATEGORY_URL);
-  categoryList = result.map(el => {
+  categoryList = result.response.map(el => {
     return { id: el.id, name: el.name, url: el.link };
   });
   addSidebarCategoryList();
@@ -80,9 +77,9 @@ function addSidebarCategoryList() {
 // 記事追加
 async function addCard() {
   let url = API_URL + encodeURI(getApiUrl(currentData)); // アクセスするAPIURLを生成
-  let result = await getArticleList(url); // データ取得
+  let result = await requestApi(url); // データ取得
   let response = result.response; // データ内からresponseを取り出す
-  let articleTotal = result.articleTotal; // データ内から総記事数を取り出す
+  let articleTotal = result.getResponseHeader("x-wp-total"); // データ内から総記事数を取り出す
 
   $add.textContent = null; // HTMLリセット
   if (response.length === 0) {
@@ -98,5 +95,10 @@ async function addCard() {
   // 記事総件数 追加
   document.getElementById("js-article-total").innerText = articleTotal;
   // ページネーション更新
-  new Pagenation(currentData.page, 5, result.pagesTotal, $pagenation);
+  new Pagenation(
+    currentData.page,
+    5,
+    result.getResponseHeader("x-wp-totalpages"),
+    $pagenation
+  );
 }
