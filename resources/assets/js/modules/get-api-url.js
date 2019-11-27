@@ -1,24 +1,17 @@
-import {
-  API_URL,
-  currentType,
-  currentPage,
-  searchText,
-  cateogyrId
-} from "../app.js";
+export default function getApiUrl(currentData) {
+  let apiUrlParam = "";
 
-export default function getApiUrl() {
-  var apiUrlParam = "";
-
-  if (currentType === "category") {
+  if (currentData.type === "category") {
     // カテゴリーで絞る
-    apiUrlParam += "&categories=" + cateogyrId;
+    apiUrlParam += "&categories=" + currentData.cateogyrId;
   }
-  if (currentType === "search") {
+
+  if (currentData.type === "search") {
     // 検索ワードで絞る
-    apiUrlParam += "&search=" + searchText;
+    apiUrlParam += "&search=" + currentData.searchText;
   }
 
-  apiUrlParam += "&page=" + currentPage;
+  apiUrlParam += "&page=" + currentData.page;
 
-  return API_URL + apiUrlParam;
+  return apiUrlParam;
 }
