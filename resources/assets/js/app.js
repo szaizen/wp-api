@@ -2,10 +2,10 @@ import formatData from "./modules/format-data.js";
 import createDom from "./modules/create-dom.js";
 import requestApi from "./modules/request-api.js";
 import getApiUrl from "./modules/get-api-url.js";
-import Pagenation from "./class/pagenation.js";
+import Pagination from "./class/pagination.js";
 
 const $add = document.getElementById("js-add");
-const $pagenation = document.getElementById("js-pagination");
+const $pagination = document.getElementById("js-pagination");
 const $search = document.getElementById("js-search-btn");
 
 let categoryList = [];
@@ -41,7 +41,7 @@ $search.addEventListener("click", () => {
 });
 
 // ページネーション
-$pagenation.addEventListener("click", e => {
+$pagination.addEventListener("click", e => {
   let clickPage = Number(e.target.dataset.pagenumber);
   currentData.page = clickPage;
   addCard();
@@ -95,10 +95,10 @@ async function addCard() {
   // 記事総件数 追加
   document.getElementById("js-article-total").innerText = articleTotal;
   // ページネーション更新
-  new Pagenation(
+  new Pagination(
     currentData.page,
     5,
     result.getResponseHeader("x-wp-totalpages"),
-    $pagenation
+    $pagination
   );
 }
